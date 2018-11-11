@@ -6,4 +6,5 @@ urlpatterns = [
 
     path('allocate/', views.allocate, name='allocate'),
     path('queues/', views.queues, name='queues'),
+    
 ]

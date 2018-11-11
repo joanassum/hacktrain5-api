@@ -1,4 +1,7 @@
-import json
+import ast, json
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
+from . import views
 
 class QueueConsumer(WebsocketConsumer):
     def connect(self):
@@ -7,6 +10,7 @@ class QueueConsumer(WebsocketConsumer):
             "subscribers",
             self.channel_name
         )
+        self.accept()
 
     def disconnect(self, close_code):
         # Leave  group
@@ -17,7 +21,8 @@ class QueueConsumer(WebsocketConsumer):
 
     # Update queue status from WebSocket
     def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+        print("receive: " + text_data)
+        text_data_json = ast.literal_eval(text_data)
         queue_status = text_data_json['queues']
         # Send queue status to subscribers
         async_to_sync(self.channel_layer.group_send)(

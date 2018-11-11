@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import time, threading
+from websocket import create_connection
 
 # Create your views here.
 
@@ -9,14 +10,26 @@ queue_population = [0] * opened_queue
 large_luggages_weight = 2
 small_luggages_weight = 1
 no_of_ppl_weight = 1
-no_of_kids_weight = 2
+no_of_kids_weight = 4
 
-decrease_time_interval = 5
+decrease_time_interval = 1
+
+def get_queues():
+    return queue_population
 
 def decrease_population():
     print(time.ctime())
     queue_population[:] = [ max(0, x - 1) for x in queue_population ]
     print(queue_population)
+    queues_json = {
+        "queues": queue_population
+    }
+    try:
+        ws = create_connection("ws://10.75.203.14:8000/ws/queues/")
+        ws.send(str(queues_json))
+        ws.close()
+    except:
+        print("Error")
     threading.Timer(decrease_time_interval, decrease_population).start()
 
 decrease_population()
@@ -33,6 +46,12 @@ def allocate(request):
     queue_population[queue_number] += no_of_ppl_weight * no_of_ppl
     queue_population[queue_number] += no_of_kids_weight * no_of_kids
     print(queue_population)
+    queues_json = {
+        "queues": queue_population
+    }
+    ws = create_connection("ws://10.75.203.14:8000/ws/queues/")
+    ws.send(str(queues_json))
+    ws.close()
     return HttpResponse(queue_number)
 
 def queues(request):

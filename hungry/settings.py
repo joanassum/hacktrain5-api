@@ -25,7 +25,7 @@ SECRET_KEY = '5!-8%g-u942w2tdey^b*nvt@jfl@86b7syv7w@n!ughn=bzazi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.75.203.14', 'localhost']
 
 
 # Application definition
@@ -120,4 +120,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-ASGI_APPLICATION = 'hungry.wsgi.application'
+ASGI_APPLICATION = 'hungry.routing.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('127.0.0.1', 6379)],
+        }
+    },
+}
